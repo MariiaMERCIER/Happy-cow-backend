@@ -14,7 +14,7 @@ const User = mongoose.model("User", {
       description: String,
       adress: String,
       rating: String,
-      type: String,
+      kitchenType: String,
       phone: String,
       photoFvrt: String,
     },

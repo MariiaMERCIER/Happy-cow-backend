@@ -97,7 +97,7 @@ router.post("/user/login", async (req, res) => {
 });
 router.get("/user/:id", isAuthenticated, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = req.user;
 
     res.status(200).json({
       name: user.name,

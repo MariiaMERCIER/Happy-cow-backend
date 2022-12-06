@@ -8,7 +8,11 @@ router.put("/favorites/place", isAuthenticated, async (req, res) => {
   try {
     const userUpdated = req.user;
 
-    console.log("userUpdated >>>", userUpdated);
+    for (let i = 0; i < userUpdated.favorites; i++) {
+      if (userUpdated.favorites.id === req.body.id) {
+        return res.status(400).json("This place has already been in your list");
+      }
+    }
 
     const newFavorite = {
       id: req.body.id,
@@ -16,30 +20,37 @@ router.put("/favorites/place", isAuthenticated, async (req, res) => {
       description: req.body.description,
       adress: req.body.address,
       rating: req.body.rating,
-      type: req.body.type,
+      kitchenType: req.body.type,
       pnone: req.body.pnone,
       photoFvrt: req.body.photo,
     };
-    console.log("newFavorite >>>", newFavorite);
 
     userUpdated.favorites.push(newFavorite);
-    // console.log(userUpdated);
-    // userUpdated.markModified("favorites");
-    await userUpdated.save();
-    // console.log(userUpdated);
 
-    res.json({
-      id: userUpdated.id,
-      name: userUpdated.name,
-      description: userUpdated.description,
-      adress: userUpdated.address,
-      rating: userUpdated.rating,
-      type: userUpdated.type,
-      pnone: userUpdated.pnone,
-      photo: userUpdated.photoFvrt,
+    await userUpdated.save();
+    userUpdated.markModified("favorites");
+    res.status(200).json({
+      message: "You have just added your favorite place",
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.put("/favorites/delete", isAuthenticated, async (req, res) => {
+  try {
+    const user = req.user;
+
+    const newFavorites = user.favorites.filter(
+      (favorite) => favorite.id !== req.body.id
+    );
+
+    user.favorites = newFavorites;
+    await user.save();
+    console.log(user.favorites);
+    res.status(200).json({ message: "The favorite place is deleted" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -48,9 +59,7 @@ router.get("/favorites", isAuthenticated, async (req, res) => {
     const user = req.user;
 
     res.status(200).json({
-      name: user.name,
-      email: user.email,
-      photo: user.photo,
+      favorites: user.favorites,
     });
   } catch (error) {
     console.log({ error: error.message });
