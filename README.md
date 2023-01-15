@@ -20,7 +20,7 @@ The back-end (for favorites) for Happy Cow project.
 Project is create with:
 
 * Node.js
-* Mongoose
+* MongoDB
 * Postman
 
 
